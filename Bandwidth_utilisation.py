@@ -119,7 +119,7 @@ if __name__ == '__main__':
     log_file_path = 'C:\\Program Files\\Network_Monitor\\logs\\bandwidth_utilisation.log'
     max_log_size_mb = 200
 
-    utilization = BandwidthUtilization('WIN-CE50GU6N1KQ', 'tempdb', 'nuvama', 'nuvama@123')
+    utilization = BandwidthUtilization('EDELNMNONTRDB01', 'tempdb', 'nuvama', 'nuvama@123')
 
     truncate_log_file(log_file_path, max_log_size_mb)
 
