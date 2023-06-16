@@ -114,7 +114,7 @@ def truncate_log_file(log_path, max_size_mb):
 
 
 if __name__ == '__main__':
-    duration_minutes = 4
+    duration_minutes = 1
     ethernet_speed_mbps = 20000
     log_file_path = 'C:\\Program Files\\Network_Monitor\\logs\\bandwidth_utilisation.log'
     max_log_size_mb = 200
