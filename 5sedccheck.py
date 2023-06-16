@@ -52,7 +52,7 @@ class BandwidthUtilization:
             self.connection.close()
 
 if __name__ == '__main__':
-    utilization = BandwidthUtilization('EDELNMNONTRDB01', 'tempdb', 'nuvama', 'nuvama@123')
+    utilization = BandwidthUtilization('127.0.0.1', 'tempdb', 'nuvama', 'nuvama@123')
     utilization.connect()
 
     try:
