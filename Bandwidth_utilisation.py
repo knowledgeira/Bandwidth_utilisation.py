@@ -1,21 +1,3 @@
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-
-#Author : MANOJ Jagdale
-#Description : This script calculates bandwidth utilisation based on you NIC interfaces and stores op in log file and database.
-
-
 import os
 import pyodbc
 import datetime
@@ -29,23 +11,23 @@ class BandwidthUtilization:
         self.database = database
         self.username = username
         self.password = password
-        self.flush_interval_minutes = 38880
-        self.last_flush_time = datetime.datetime.now()
+        self.max_reconnection_attempts = 3
+        self.reconnection_delay = 5  # seconds
 
         self.connection = None
         self.cursor = None
+        self.reconnection_count = 0
 
     def connect(self):
         connection_string = f"DRIVER={{SQL Server}};SERVER={self.server};DATABASE={self.database};UID={self.username};PWD={self.password}"
         try:
             self.connection = pyodbc.connect(connection_string)
             self.cursor = self.connection.cursor()
+            self.reconnection_count = 0  # Reset reconnection count
             print("Database connection successful.")
         except pyodbc.Error as e:
             error_message = "Error connecting to the database: " + str(e)
             print(error_message)
-            log_file.write(error_message + '\n')
-            log_file.flush()
             sys.exit(1)
 
     def create_table(self):
@@ -71,8 +53,6 @@ class BandwidthUtilization:
             except pyodbc.Error as e:
                 error_message = "Error creating table: " + str(e)
                 print(error_message)
-                log_file.write(error_message + '\n')
-                log_file.flush()
 
     def save_data(self, capture_time, utilization, total_bytes):
         insert_query = '''
@@ -81,7 +61,7 @@ class BandwidthUtilization:
         '''
         self.cursor.execute(insert_query, capture_time, utilization, total_bytes)
         self.connection.commit()
-        #print("Data saved successfully.")
+        print(f"Data saved: Capture Time: {capture_time}, Bandwidth Utilization: {utilization:.2f}%, Total Bytes: {total_bytes / (1024 ** 3):.2f} GB / {total_bytes / (1024 ** 2):.2f} MB")
 
     def check_flush_database(self):
         current_time = datetime.datetime.now()
@@ -103,15 +83,16 @@ class BandwidthUtilization:
         if self.connection is not None:
             self.connection.close()
 
-
-def truncate_log_file(log_path, max_size_mb):
-    if os.path.exists(log_path):
-        log_size = os.path.getsize(log_path) / (1024 * 1024)  
-        if log_size > max_size_mb:
-            with open(log_path, 'w') as log_file:
-                log_file.truncate()
-                print(f"Log file truncated: {log_path}")
-
+    def reconnect(self):
+        self.close_connection()
+        if self.reconnection_count < self.max_reconnection_attempts:
+            self.reconnection_count += 1
+            print(f"Reconnecting... (Attempt {self.reconnection_count})")
+            time.sleep(self.reconnection_delay)
+            self.connect()
+        else:
+            print("Maximum reconnection attempts reached. Failed to reconnect.")
+            sys.exit(1)
 
 if __name__ == '__main__':
     duration_minutes = 1
