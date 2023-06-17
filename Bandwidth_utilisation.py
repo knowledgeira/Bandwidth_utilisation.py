@@ -102,7 +102,7 @@ class BandwidthUtilization:
             self.connect()
         else:
             print("Maximum reconnection attempts reached. Failed to reconnect.")
-            sys.exit(1)
+            
 
 if __name__ == '__main__':
     duration_minutes = 1
