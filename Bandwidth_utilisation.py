@@ -41,6 +41,7 @@ class BandwidthUtilization:
     def connect(self):
         connection_string = f"DRIVER={{SQL Server}};SERVER={self.server};DATABASE={self.database};UID={self.username};PWD={self.password}"
         try:
+            pyodbc.pooling = False
             self.connection = pyodbc.connect(connection_string)
             self.cursor = self.connection.cursor()
             self.reconnection_count = 0  
