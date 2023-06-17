@@ -30,7 +30,7 @@ class BandwidthUtilization:
         except pyodbc.Error as e:
             error_message = "Error connecting to the database: " + str(e)
             print(error_message)
-            sys.exit(1)
+            #sys.exit(1)
 
     def create_table(self):
         table_exists_query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'bandwidth_utilization'"
@@ -63,7 +63,7 @@ class BandwidthUtilization:
         '''
         self.cursor.execute(insert_query, capture_time, utilization, total_bytes)
         self.connection.commit()
-        print(f"Data saved: Capture Time: {capture_time}, Bandwidth Utilization: {utilization:.2f}%, Total Bytes: {total_bytes / (1024 ** 3):.2f} GB / {total_bytes / (1024 ** 2):.2f} MB")
+        #print(f"Data saved: Capture Time: {capture_time}, Bandwidth Utilization: {utilization:.2f}%, Total Bytes: {total_bytes / (1024 ** 3):.2f} GB / {total_bytes / (1024 ** 2):.2f} MB")
 
     def check_flush_database(self):
         current_time = datetime.datetime.now()
