@@ -14,7 +14,7 @@ class BandwidthUtilization:
         self.max_reconnection_attempts = 3
         self.reconnection_delay = 10
         self.last_flush_time = datetime.datetime.now()
-        self.flush_interval_minutes = 30
+        self.flush_interval_minutes = 38880
 
         self.connection = None
         self.cursor = None
@@ -92,18 +92,29 @@ class BandwidthUtilization:
                 with open(log_path, 'w') as log_file:
                     log_file.truncate()
                 print(f"Log file truncated: {log_path}")
-
+                
     def reconnect(self):
-        self.close_connection()
-        if self.reconnection_count < self.max_reconnection_attempts:
-            self.reconnection_count += 1
-            print(f"Reconnecting... (Attempt {self.reconnection_count})")
-            time.sleep(self.reconnection_delay)
-            self.connect()
-        else:
-            print("Maximum reconnection attempts reached. Failed to reconnect.")
-            sys.exit(1)
-            
+    self.close_connection()
+    if self.reconnection_count < self.max_reconnection_attempts:
+        self.reconnection_count += 1
+        print(f"Reconnecting... (Attempt {self.reconnection_count})")
+        log_message = f"Reconnecting... (Attempt {self.reconnection_count})"
+        log_file.write(log_message + '\n')
+        log_file.flush()
+        time.sleep(self.reconnection_delay)
+        self.connect()
+        self.create_table()
+        self.save_data(self.previous_capture_time, self.previous_utilization_value, self.previous_total_bytes)
+        print("Data saved after reconnect.")
+        log_message = "Data saved after reconnect."
+        log_file.write(log_message + '\n')
+        log_file.flush()
+    else:
+        print("Maximum reconnection attempts reached. Failed to reconnect.")
+        log_message = "Maximum reconnection attempts reached. Failed to reconnect."
+        log_file.write(log_message + '\n')
+        log_file.flush()
+        sys.exit(1)
 
 if __name__ == '__main__':
     duration_minutes = 1
