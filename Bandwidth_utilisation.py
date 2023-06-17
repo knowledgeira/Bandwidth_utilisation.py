@@ -13,6 +13,8 @@ class BandwidthUtilization:
         self.password = password
         self.max_reconnection_attempts = 3
         self.reconnection_delay = 5  # seconds
+        self.last_flush_time = datetime.datetime.now()
+        self.flush_interval_minutes = 30
 
         self.connection = None
         self.cursor = None
@@ -83,14 +85,13 @@ class BandwidthUtilization:
         if self.connection is not None:
             self.connection.close()
 
-   def truncate_log_file(log_path, max_size_mb):
-    if os.path.exists(log_path):
-        log_size = os.path.getsize(log_path) / (1024 * 1024)
-        if log_size > max_size_mb:
-            with open(log_path, 'w') as log_file:
-                log_file.truncate()
-            print(f"Log file truncated: {log_path}")
-
+    def truncate_log_file(self, log_path, max_size_mb):
+        if os.path.exists(log_path):
+            log_size = os.path.getsize(log_path) / (1024 * 1024)
+            if log_size > max_size_mb:
+                with open(log_path, 'w') as log_file:
+                    log_file.truncate()
+                print(f"Log file truncated: {log_path}")
 
     def reconnect(self):
         self.close_connection()
@@ -111,7 +112,7 @@ if __name__ == '__main__':
 
     utilization = BandwidthUtilization('EDELNMNONTRDB01', 'tempdb', 'nuvama', 'nuvama@123')
 
-    truncate_log_file(log_file_path, max_log_size_mb)
+    utilization.truncate_log_file(log_file_path, max_log_size_mb)
 
     log_file = open(log_file_path, 'a')
 
