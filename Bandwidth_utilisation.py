@@ -30,7 +30,7 @@ class BandwidthUtilization:
         except pyodbc.Error as e:
             error_message = "Error connecting to the database: " + str(e)
             print(error_message)
-            #sys.exit(1)
+            
 
     def create_table(self):
         table_exists_query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'bandwidth_utilization'"
