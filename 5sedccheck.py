@@ -9,7 +9,7 @@ class BandwidthUtilization:
         self.username = username
         self.password = password
         self.max_reconnection_attempts = 3
-        self.reconnection_delay = 5  # seconds
+        self.reconnection_delay = 10
 
         self.connection = None
         self.cursor = None
