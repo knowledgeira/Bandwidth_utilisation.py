@@ -12,7 +12,7 @@ class BandwidthUtilization:
         self.username = username
         self.password = password
         self.max_reconnection_attempts = 3
-        self.reconnection_delay = 5  # seconds
+        self.reconnection_delay = 10
         self.last_flush_time = datetime.datetime.now()
         self.flush_interval_minutes = 30
 
@@ -102,6 +102,7 @@ class BandwidthUtilization:
             self.connect()
         else:
             print("Maximum reconnection attempts reached. Failed to reconnect.")
+            sys.exit(1)
             
 
 if __name__ == '__main__':
@@ -135,7 +136,11 @@ if __name__ == '__main__':
             ethernet_speed_bps = ethernet_speed_mbps * 1000000
             bandwidth_utilization = ((bits_sent_total + bits_received_total) / (duration_seconds * ethernet_speed_bps)) * 100
             total_bytes = bytes_sent_total + bytes_received_total
-            utilization.save_data(capture_time, bandwidth_utilization, total_bytes)
+            try:
+                utilization.save_data(capture_time, bandwidth_utilization, total_bytes)
+            except pyodbc.Error:
+                print("Error occurred while saving data. Reconnecting...")
+                utilization.reconnect()
             utilization.check_flush_database()
             total_bytes_gb = total_bytes / (1024 ** 3)
             total_bytes_mb = total_bytes / (1024 ** 2)
