@@ -1,3 +1,21 @@
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+
+#Author : MANOJ Jagdale
+#Description : This script calculates bandwidth utilisation based on you NIC interfaces and stores op in log file and database.
+#Email:knowledgeira@gmail.com
+
 import os
 import pyodbc
 import datetime
@@ -104,7 +122,7 @@ class BandwidthUtilization:
             time.sleep(self.reconnection_delay)
             self.connect()
             self.create_table()
-            self.save_data(self.previous_capture_time, self.previous_utilization_value, self.previous_total_bytes)
+            self.save_data(capture_time, utilization_value, total_bytes)
             print("Data saved after reconnect.")
             log_message = "Data saved after reconnect."
             log_file.write(log_message + '\n')
