@@ -83,13 +83,14 @@ class BandwidthUtilization:
         if self.connection is not None:
             self.connection.close()
 
-    def truncate_log_file(log_path, max_size_mb):
+   def truncate_log_file(log_path, max_size_mb):
     if os.path.exists(log_path):
-        log_size = os.path.getsize(log_path) / (1024 * 1024)  
+        log_size = os.path.getsize(log_path) / (1024 * 1024)
         if log_size > max_size_mb:
             with open(log_path, 'w') as log_file:
                 log_file.truncate()
-                print(f"Log file truncated: {log_path}")
+            print(f"Log file truncated: {log_path}")
+
 
     def reconnect(self):
         self.close_connection()
