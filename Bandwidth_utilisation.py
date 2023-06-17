@@ -25,7 +25,7 @@ class BandwidthUtilization:
         try:
             self.connection = pyodbc.connect(connection_string)
             self.cursor = self.connection.cursor()
-            self.reconnection_count = 0  # Reset reconnection count
+            self.reconnection_count = 0  
             print("Database connection successful.")
         except pyodbc.Error as e:
             error_message = "Error connecting to the database: " + str(e)
