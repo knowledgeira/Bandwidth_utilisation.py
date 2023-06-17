@@ -77,7 +77,7 @@ class BandwidthUtilization:
         truncate_query = "TRUNCATE TABLE bandwidth_utilization"
         self.cursor.execute(truncate_query)
         self.connection.commit()
-        print("Database flushed successfully.")
+        #print("Database flushed successfully.")
 
     def close_connection(self):
         if self.cursor is not None:
