@@ -29,7 +29,7 @@ class BandwidthUtilization:
         self.database = database
         self.username = username
         self.password = password
-        self.max_reconnection_attempts = 3
+        self.max_reconnection_attempts = 5
         self.reconnection_delay = 10
         self.last_flush_time = datetime.datetime.now()
         self.flush_interval_minutes = 38880
@@ -109,24 +109,28 @@ class BandwidthUtilization:
             if log_size > max_size_mb:
                 with open(log_path, 'w') as log_file:
                     log_file.truncate()
-                print(f"Log file truncated: {log_path}")
-                
-    def reconnect(self):
+                print(f"Log file truncated: {log_path}")    
+
+
+    def reconnect(self, capture_time, utilization_value, total_bytes, log_file):
         self.close_connection()
-        if self.reconnection_count < self.max_reconnection_attempts:
-            self.reconnection_count += 1
-            print(f"Reconnecting... (Attempt {self.reconnection_count})")
-            log_message = f"Reconnecting... (Attempt {self.reconnection_count})"
+        for attempt in range(1, self.max_reconnection_attempts + 1):
+            print(f"Reconnecting... (Attempt {attempt})")
+            log_message = f"Reconnecting... (Attempt {attempt})"
             log_file.write(log_message + '\n')
             log_file.flush()
             time.sleep(self.reconnection_delay)
-            self.connect()
-            self.create_table()
-            self.save_data(capture_time, utilization_value, total_bytes)
-            print("Data saved after reconnect.")
-            log_message = "Data saved after reconnect."
-            log_file.write(log_message + '\n')
-            log_file.flush()
+            try:
+                self.connect()
+                self.create_table()
+                self.save_data(capture_time, utilization_value, total_bytes)
+                print("Data saved after reconnect.")
+                log_message = "Data saved after reconnect."
+                log_file.write(log_message + '\n')
+                log_file.flush()
+                return
+            except pyodbc.Error:
+                continue  
         else:
             print("Maximum reconnection attempts reached. Failed to reconnect.")
             log_message = "Maximum reconnection attempts reached. Failed to reconnect."
@@ -134,13 +138,17 @@ class BandwidthUtilization:
             log_file.flush()
             sys.exit(1)
 
+    
+                
+
+
 if __name__ == '__main__':
-    duration_minutes = 1
+    duration_minutes = 4
     ethernet_speed_mbps = 20000
     log_file_path = 'C:\\Program Files\\Network_Monitor\\logs\\bandwidth_utilisation.log'
     max_log_size_mb = 200
 
-    utilization = BandwidthUtilization('127.0.0.1', 'tempdb', 'nuvama', 'nuvama@123')
+    utilization = BandwidthUtilization('WIN-CE50GU6N1KQ', 'tempdb', 'nuvama', 'nuvama@123')
 
     utilization.truncate_log_file(log_file_path, max_log_size_mb)
 
@@ -169,7 +177,8 @@ if __name__ == '__main__':
                 utilization.save_data(capture_time, bandwidth_utilization, total_bytes)
             except pyodbc.Error:
                 print("Error occurred while saving data. Reconnecting...")
-                utilization.reconnect()
+                utilization.reconnect(capture_time, bandwidth_utilization, total_bytes, log_file)
+    
             utilization.check_flush_database()
             total_bytes_gb = total_bytes / (1024 ** 3)
             total_bytes_mb = total_bytes / (1024 ** 2)
