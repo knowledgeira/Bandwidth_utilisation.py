@@ -23,7 +23,7 @@ class BandwidthUtilization:
         try:
             self.connection = pyodbc.connect(connection_string)
             self.cursor = self.connection.cursor()
-            print("Database connection successful.")
+            #print("Database connection successful.")
         except pyodbc.Error as e:
             error_message = "Error connecting to the database: " + str(e)
             print(error_message)
@@ -94,7 +94,7 @@ class BandwidthUtilization:
                 log_file.flush()
                 sys.exit(1)
         finally:
-            print("Deleting from SAVE_DATA Method")
+           # print("Deleting from SAVE_DATA Method")
             self.connection.close()# Delete the connection after saving the data
     
 
@@ -131,7 +131,7 @@ def truncate_log_file(log_path, max_size_mb):
 
 
 if __name__ == '__main__':
-    duration_minutes = 1
+    duration_minutes = 4
     ethernet_speed_mbps = 20000
     log_file_path = 'C:\\Program Files\\Network_Monitor\\logs\\bandwidth_utilisation.log'
     max_log_size_mb = 200
@@ -165,7 +165,7 @@ if __name__ == '__main__':
             ethernet_speed_bps = ethernet_speed_mbps * 1000000
             bandwidth_utilization = ((bits_sent_total + bits_received_total) / (duration_seconds * ethernet_speed_bps)) * 100
             total_bytes = bytes_sent_total + bytes_received_total
-            print("Running FROM MAIN LOOOP UNDER WHILE")
+            #print("Running FROM MAIN LOOOP UNDER WHILE")
             utilization.connect()
             utilization.save_data(capture_time, bandwidth_utilization, total_bytes)
             total_bytes_gb = total_bytes / (1024 ** 3)
